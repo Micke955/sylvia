@@ -109,6 +109,10 @@ export default async function HomePage() {
           </Link>
         </div>
       </div>
+      <div className="soft-card rounded-3xl p-5 text-sm text-[var(--text-muted)]">
+        SYLVIA est une application de gestion de bibliotheque personnelle pour
+        organiser vos lectures, suivre vos progres et partager vos coups de coeur.
+      </div>
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="soft-card rounded-3xl p-6">

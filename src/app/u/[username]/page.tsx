@@ -4,6 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { formatUsername, isValidCoverUrl, normalizeAvatarUrl, synopsisText } from "@/lib/utils";
 import AvatarImage from "@/components/AvatarImage";
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
 export async function generateMetadata({
   params,
 }: {
@@ -14,10 +18,14 @@ export async function generateMetadata({
   const displayName = formatUsername(rawUsername) || rawUsername || "Profil";
   const title = `Profil de ${displayName}`;
   const description = `Bibliotheque publique et wishlist de ${displayName} sur SYLVIA.`;
+  const canonical = `${siteUrl}/u/${rawUsername.trim().toLowerCase() || rawUsername}`;
 
   return {
     title,
     description,
+    alternates: {
+      canonical,
+    },
     openGraph: {
       title,
       description,
@@ -136,15 +144,31 @@ export default async function PublicProfilePage({
   const topGenres = Object.entries(genreCount)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
+  const displayName = formatUsername(profile.username) || "Lecteur";
+  const profileUrl = `${siteUrl}/u/${profile.username ?? normalizedUsername}`;
+  const avatarPublicUrl = normalizeAvatarUrl(profile.avatar_url);
+  const profileJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: displayName,
+    url: profileUrl,
+    image: avatarPublicUrl || undefined,
+    description: `Bibliotheque publique et wishlist de ${displayName} sur SYLVIA.`,
+  };
 
   return (
     <div className="space-y-6">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(profileJsonLd) }}
+      />
       <div className="soft-card rounded-3xl p-6">
         <div className="flex items-center gap-4">
           <div className="h-16 w-16 overflow-hidden rounded-full border border-[var(--border)] bg-[var(--surface-muted)]">
-            {normalizeAvatarUrl(profile.avatar_url) ? (
+            {avatarPublicUrl ? (
               <AvatarImage
-                src={normalizeAvatarUrl(profile.avatar_url) ?? ""}
+                src={avatarPublicUrl}
                 alt={profile.username ?? "Avatar"}
                 className="h-full w-full object-cover"
               />
@@ -152,7 +176,7 @@ export default async function PublicProfilePage({
           </div>
           <div>
             <h1 className="section-title text-2xl font-semibold">
-              {formatUsername(profile.username) || "Lecteur"}
+              {displayName}
             </h1>
             <p className="text-sm text-[var(--text-muted)]">
               Collection partagee
