@@ -80,8 +80,8 @@ export default async function LibraryPage() {
     .eq("in_library", true)
     .order("added_at", { ascending: false });
 
-  const stats = computeStats((items ?? []) as LibraryItem[]);
-  const timelineItems = (items ?? []) as LibraryItem[];
+  const stats = computeStats((items ?? []) as unknown as LibraryItem[]);
+  const timelineItems = (items ?? []) as unknown as LibraryItem[];
   const statusLabels: Record<string, string> = {
     to_read: "A lire",
     reading: "En cours",
