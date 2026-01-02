@@ -1,7 +1,33 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatUsername, isValidCoverUrl, normalizeAvatarUrl, synopsisText } from "@/lib/utils";
 import AvatarImage from "@/components/AvatarImage";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  const rawUsername = resolvedParams?.username ?? "";
+  const displayName = formatUsername(rawUsername) || rawUsername || "Profil";
+  const title = `Profil de ${displayName}`;
+  const description = `Bibliotheque publique et wishlist de ${displayName} sur SYLVIA.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+    },
+    twitter: {
+      title,
+      description,
+    },
+  };
+}
 
 export default async function PublicProfilePage({
   params,
