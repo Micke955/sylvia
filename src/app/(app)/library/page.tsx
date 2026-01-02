@@ -9,7 +9,9 @@ function computeStats(items: LibraryItem[]) {
   const toRead = items.filter((item) => item.reading_status === "to_read").length;
   const reading = items.filter((item) => item.reading_status === "reading").length;
   const finished = items.filter((item) => item.reading_status === "finished").length;
-  const ratings = items.map((item) => item.rating).filter((rating) => rating);
+  const ratings = items
+    .map((item) => item.rating)
+    .filter((rating): rating is number => typeof rating === "number");
   const avgRating =
     ratings.length > 0
       ? (ratings.reduce((acc, value) => acc + (value ?? 0), 0) / ratings.length).toFixed(1)
