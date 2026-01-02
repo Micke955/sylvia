@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import CustomListsClient from "@/components/CustomListsClient";
+import type { ListRecord, ListItem, LibraryItem } from "@/components/CustomListsClient";
 
 export default async function ListsPage() {
   const supabase = await createClient();
@@ -61,9 +62,9 @@ export default async function ListsPage() {
       <CustomListsClient
         userId={user.id}
         username={profile?.username ?? null}
-        lists={lists ?? []}
-        listItems={listItems ?? []}
-        libraryItems={libraryItems ?? []}
+        lists={(lists ?? []) as unknown as ListRecord[]}
+        listItems={(listItems ?? []) as unknown as ListItem[]}
+        libraryItems={(libraryItems ?? []) as unknown as LibraryItem[]}
       />
     </div>
   );

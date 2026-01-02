@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-type ListRecord = {
+export type ListRecord = {
   id: string;
   name: string;
   description: string | null;
@@ -11,7 +11,7 @@ type ListRecord = {
   created_at: string;
 };
 
-type ListItem = {
+export type ListItem = {
   list_id: string;
   book_id: string;
   added_at: string;
@@ -23,7 +23,7 @@ type ListItem = {
   } | null;
 };
 
-type LibraryItem = {
+export type LibraryItem = {
   book_id: string;
   books: {
     id: string;
