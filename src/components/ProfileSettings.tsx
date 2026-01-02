@@ -19,6 +19,8 @@ export default function ProfileSettings({
   isPublicLibrary,
   isPublicWishlist,
 }: ProfileSettingsProps) {
+  const maxAvatarMb = 5;
+  const maxAvatarBytes = maxAvatarMb * 1024 * 1024;
   const [formState, setFormState] = useState({
     username: username ?? "",
     avatarUrl: normalizeAvatarUrl(avatarUrl) ?? "",
@@ -179,8 +181,8 @@ export default function ProfileSettings({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      setStatus("Fichier trop volumineux (max 2 Mo).");
+    if (file.size > maxAvatarBytes) {
+      setStatus(`Fichier trop volumineux (max ${maxAvatarMb} Mo).`);
       return;
     }
 
@@ -437,7 +439,7 @@ export default function ProfileSettings({
           </button>
         </div>
         <p className="mt-2 text-xs text-[var(--text-muted)]">
-          JPG/PNG, 2 Mo max. Recadrage manuel circulaire.
+          JPG/PNG, {maxAvatarMb} Mo max. Recadrage manuel circulaire.
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
