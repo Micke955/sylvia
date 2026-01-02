@@ -53,7 +53,7 @@ export default async function AppLayout({
   return (
     <div className="app-shell">
       <SiteNav user={user} profile={profile} />
-      <main className="page-transition mx-auto w-full max-w-6xl px-6 pb-24 pt-24 lg:pb-10 lg:pt-28">
+      <main className="page-transition mx-auto w-full max-w-6xl px-6 pb-32 pt-24 sm:pb-28 lg:pb-10 lg:pt-28">
         {user ? (
           <div className="mb-6">
             <NotificationBanner
