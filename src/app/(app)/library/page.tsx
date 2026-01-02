@@ -124,7 +124,7 @@ export default async function LibraryPage() {
           </p>
         </div>
       </div>
-      <LibraryClient items={(items ?? []) as LibraryItem[]} />
+      <LibraryClient items={(items ?? []) as unknown as LibraryItem[]} />
       <section className="space-y-3">
         <h2 className="section-title text-2xl font-semibold">Historique detaille</h2>
         <div className="soft-card overflow-hidden rounded-2xl">
