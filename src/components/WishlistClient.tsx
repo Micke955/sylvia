@@ -78,7 +78,7 @@ export default function WishlistClient({ items }: WishlistClientProps) {
         return;
       }
 
-      setLocalItems((data ?? []) as WishlistItem[]);
+      setLocalItems((data ?? []) as unknown as WishlistItem[]);
       setHydrated(true);
     };
 

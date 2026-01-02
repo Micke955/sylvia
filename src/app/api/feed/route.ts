@@ -8,12 +8,18 @@ type FeedRow = {
   added_at: string;
   rating: number | null;
   public_review: string | null;
-  books: {
-    title: string;
-    authors: string[];
-    cover_url: string | null;
-    description: string | null;
-  };
+  books: FeedBook;
+};
+
+type FeedBook = {
+  title: string;
+  authors: string[];
+  cover_url: string | null;
+  description: string | null;
+};
+
+type FeedRowRaw = Omit<FeedRow, "books"> & {
+  books: FeedBook | FeedBook[] | null;
 };
 
 export async function GET(request: Request) {
@@ -56,10 +62,20 @@ export async function GET(request: Request) {
     (profiles ?? []).map((profile) => [profile.id, profile]),
   );
 
-  const items = (rows ?? [])
+  const normalizedRows = (rows ?? []).map((row) => {
+    const raw = row as FeedRowRaw;
+    const book = Array.isArray(raw.books) ? raw.books[0] : raw.books;
+    return { ...raw, books: book ?? null };
+  });
+
+  const items = normalizedRows
     .filter(
-      (row) =>
-        isValidCoverUrl(row.books?.cover_url ?? null) && row.books?.description,
+      (row): row is FeedRow =>
+        Boolean(
+          row.books &&
+            isValidCoverUrl(row.books.cover_url ?? null) &&
+            row.books.description,
+        ),
     )
     .map((row) => ({
       ...row,

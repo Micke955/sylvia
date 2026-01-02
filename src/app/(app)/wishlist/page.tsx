@@ -44,7 +44,7 @@ export default async function WishlistPage() {
           Gardez vos prochaines lectures a portee de main.
         </p>
       </div>
-      <WishlistClient items={(items ?? []) as WishlistItem[]} />
+      <WishlistClient items={(items ?? []) as unknown as WishlistItem[]} />
     </div>
   );
 }

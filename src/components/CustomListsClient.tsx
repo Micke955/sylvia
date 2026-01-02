@@ -151,7 +151,7 @@ export default function CustomListsClient({
       .select("list_id, book_id, added_at, books(id, title, authors, cover_url)")
       .single();
     if (error) return;
-    setLocalItems((prev) => [...prev, data]);
+    setLocalItems((prev) => [...prev, data as unknown as ListItem]);
   };
 
   const removeFromList = async (listId: string, bookId: string) => {

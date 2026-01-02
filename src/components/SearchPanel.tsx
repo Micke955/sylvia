@@ -196,8 +196,8 @@ export default function SearchPanel() {
   };
 
   useEffect(() => {
-    if (!scannerOpen) return;
-    if (!videoRef.current) return;
+    if (!scannerOpen || !videoRef.current) return;
+    const videoEl = videoRef.current;
     let cancelled = false;
     const reader = new BrowserMultiFormatReader();
     setScanError(null);
@@ -207,7 +207,7 @@ export default function SearchPanel() {
       try {
         const controls = await reader.decodeFromVideoDevice(
           undefined,
-          videoRef.current,
+          videoEl,
           (result) => {
             if (!result || cancelled) return;
             const text = result.getText();

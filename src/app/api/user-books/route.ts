@@ -33,6 +33,8 @@ export async function POST(request: Request) {
           categories: Array.isArray(book.categories) ? book.categories : [],
           isbn10: book.isbn10 ?? null,
           isbn13: book.isbn13 ?? null,
+          language: book.language ?? null,
+          published_date: book.published_date ?? null,
           published_year:
             typeof book.published_year === "number" &&
             Number.isFinite(book.published_year)

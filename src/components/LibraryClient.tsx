@@ -109,7 +109,7 @@ export default function LibraryClient({ items }: LibraryClientProps) {
         return;
       }
 
-      setLocalItems((data ?? []) as LibraryItem[]);
+      setLocalItems((data ?? []) as unknown as LibraryItem[]);
       setHydrated(true);
     };
 

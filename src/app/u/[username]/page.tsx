@@ -8,6 +8,12 @@ export default async function PublicProfilePage({
 }: {
   params: Promise<{ username: string }>;
 }) {
+  const toBook = (
+    books:
+      | { title?: string; authors?: string[]; cover_url?: string | null; description?: string | null; categories?: string[] | null }
+      | { title?: string; authors?: string[]; cover_url?: string | null; description?: string | null; categories?: string[] | null }[]
+      | null,
+  ) => (Array.isArray(books) ? books[0] : books);
   const supabase = await createClient();
   const resolvedParams = await params;
   const rawUsername = resolvedParams?.username ?? "";
@@ -78,7 +84,10 @@ export default async function PublicProfilePage({
 
   const libraryItems = (library.data ?? []) as Array<{
     rating: number | null;
-    books: { categories?: string[] | null } | null;
+    books:
+      | { categories?: string[] | null }
+      | { categories?: string[] | null }[]
+      | null;
   }>;
   const wishlistItems = wishlist.data ?? [];
   const totalLibrary = libraryItems.length;
@@ -91,7 +100,7 @@ export default async function PublicProfilePage({
       ? (ratingValues.reduce((acc, value) => acc + value, 0) / ratingValues.length).toFixed(1)
       : "0";
   const genreCount = libraryItems.reduce<Record<string, number>>((acc, item) => {
-    const categories = item.books?.categories ?? [];
+    const categories = toBook(item.books)?.categories ?? [];
     categories.forEach((category) => {
       if (!category) return;
       acc[category] = (acc[category] ?? 0) + 1;
@@ -221,41 +230,45 @@ export default async function PublicProfilePage({
           <div className="grid gap-4 md:grid-cols-2">
             {(library.data ?? [])
               .filter((item) => {
-                if (!isValidCoverUrl(item.books?.cover_url)) return false;
-                return Boolean(item.books?.description);
+                const book = toBook(item.books);
+                if (!isValidCoverUrl(book?.cover_url ?? null)) return false;
+                return Boolean(book?.description);
               })
-              .map((item) => (
-              <article key={item.book_id} className="soft-card rounded-3xl p-5">
-                <h3 className="section-title text-lg font-semibold">
-                  {item.books?.title ?? "Titre"}
-                </h3>
-                <span className="pill text-[10px] uppercase tracking-[0.15em]">
-                  {item.reading_status === "finished"
-                    ? "Lu"
-                    : item.reading_status === "reading"
-                      ? "En cours"
-                      : "A lire"}
-                </span>
-                <p className="text-xs text-[var(--text-muted)]">
-                  {item.books?.authors?.length
-                    ? item.books.authors.join(", ")
-                    : "Auteur inconnu"}
-                </p>
-                <p className="text-xs text-[var(--text-muted)]">
-                  {synopsisText(item.books?.description ?? null)}
-                </p>
-                {item.rating ? (
-                  <p className="mt-2 text-xs text-[var(--text-muted)]">
-                    Note : {item.rating}/5
-                  </p>
-                ) : null}
-                {item.is_public_review && item.public_review ? (
-                  <p className="mt-2 text-sm text-[var(--text)]">
-                    “{item.public_review}”
-                  </p>
-                ) : null}
-              </article>
-            ))}
+              .map((item) => {
+                const book = toBook(item.books);
+                return (
+                  <article key={item.book_id} className="soft-card rounded-3xl p-5">
+                    <h3 className="section-title text-lg font-semibold">
+                      {book?.title ?? "Titre"}
+                    </h3>
+                    <span className="pill text-[10px] uppercase tracking-[0.15em]">
+                      {item.reading_status === "finished"
+                        ? "Lu"
+                        : item.reading_status === "reading"
+                          ? "En cours"
+                          : "A lire"}
+                    </span>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      {book?.authors?.length
+                        ? book.authors.join(", ")
+                        : "Auteur inconnu"}
+                    </p>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      {synopsisText(book?.description ?? null)}
+                    </p>
+                    {item.rating ? (
+                      <p className="mt-2 text-xs text-[var(--text-muted)]">
+                        Note : {item.rating}/5
+                      </p>
+                    ) : null}
+                    {item.is_public_review && item.public_review ? (
+                      <p className="mt-2 text-sm text-[var(--text)]">
+                        “{item.public_review}”
+                      </p>
+                    ) : null}
+                  </article>
+                );
+              })}
           </div>
         </section>
       ) : (
@@ -270,31 +283,35 @@ export default async function PublicProfilePage({
           <div className="grid gap-4 md:grid-cols-2">
             {(wishlist.data ?? [])
               .filter((item) => {
-                if (!isValidCoverUrl(item.books?.cover_url)) return false;
-                return Boolean(item.books?.description);
+                const book = toBook(item.books);
+                if (!isValidCoverUrl(book?.cover_url ?? null)) return false;
+                return Boolean(book?.description);
               })
-              .map((item) => (
-              <article key={item.book_id} className="soft-card rounded-3xl p-5">
-                <h3 className="section-title text-lg font-semibold">
-                  {item.books?.title ?? "Titre"}
-                </h3>
-                <span className="pill text-[10px] uppercase tracking-[0.15em]">
-                  {item.reading_status === "finished"
-                    ? "Lu"
-                    : item.reading_status === "reading"
-                      ? "En cours"
-                      : "A lire"}
-                </span>
-                <p className="text-xs text-[var(--text-muted)]">
-                  {item.books?.authors?.length
-                    ? item.books.authors.join(", ")
-                    : "Auteur inconnu"}
-                </p>
-                <p className="text-xs text-[var(--text-muted)]">
-                  {synopsisText(item.books?.description ?? null)}
-                </p>
-              </article>
-            ))}
+              .map((item) => {
+                const book = toBook(item.books);
+                return (
+                  <article key={item.book_id} className="soft-card rounded-3xl p-5">
+                    <h3 className="section-title text-lg font-semibold">
+                      {book?.title ?? "Titre"}
+                    </h3>
+                    <span className="pill text-[10px] uppercase tracking-[0.15em]">
+                      {item.reading_status === "finished"
+                        ? "Lu"
+                        : item.reading_status === "reading"
+                          ? "En cours"
+                          : "A lire"}
+                    </span>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      {book?.authors?.length
+                        ? book.authors.join(", ")
+                        : "Auteur inconnu"}
+                    </p>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      {synopsisText(book?.description ?? null)}
+                    </p>
+                  </article>
+                );
+              })}
           </div>
         </section>
       ) : (

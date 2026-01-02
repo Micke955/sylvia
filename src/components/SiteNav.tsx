@@ -106,7 +106,7 @@ export default function SiteNav({ user, profile }: SiteNavProps) {
                   {avatarUrl ? (
                     <AvatarImage
                       src={avatarUrl}
-                      alt={profile.username ?? "Avatar"}
+                      alt={profile?.username ?? "Avatar"}
                       className="h-full w-full object-cover"
                     />
                   ) : null}

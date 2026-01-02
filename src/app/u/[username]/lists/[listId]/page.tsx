@@ -7,6 +7,12 @@ export default async function PublicListPage({
 }: {
   params: Promise<{ username: string; listId: string }>;
 }) {
+  const toBook = (
+    books:
+      | { id?: string; title?: string; authors?: string[]; cover_url?: string | null; description?: string | null }
+      | { id?: string; title?: string; authors?: string[]; cover_url?: string | null; description?: string | null }[]
+      | null,
+  ) => (Array.isArray(books) ? books[0] : books);
   const supabase = await createClient();
   const resolvedParams = await params;
   const rawUsername = resolvedParams?.username ?? "";
@@ -43,9 +49,10 @@ export default async function PublicListPage({
     .select("book_id, books(id, title, authors, cover_url, description)")
     .eq("list_id", list.id);
 
-  const visibleItems = (items ?? []).filter(
-    (item) => item.books?.cover_url && item.books?.description,
-  );
+  const visibleItems = (items ?? []).filter((item) => {
+    const book = toBook(item.books);
+    return Boolean(book?.cover_url && book?.description);
+  });
 
   return (
     <div className="space-y-6">
@@ -62,21 +69,24 @@ export default async function PublicListPage({
       </div>
       {visibleItems.length ? (
         <div className="grid gap-4 md:grid-cols-2">
-          {visibleItems.map((item) => (
-            <article key={item.book_id} className="soft-card rounded-3xl p-5">
-              <h3 className="section-title text-lg font-semibold">
-                {item.books?.title ?? "Titre"}
-              </h3>
-              <p className="text-xs text-[var(--text-muted)]">
-                {item.books?.authors?.length
-                  ? item.books.authors.join(", ")
-                  : "Auteur inconnu"}
-              </p>
-              <p className="text-xs text-[var(--text-muted)]">
-                {item.books?.description ?? "Synopsis indisponible."}
-              </p>
-            </article>
-          ))}
+          {visibleItems.map((item) => {
+            const book = toBook(item.books);
+            return (
+              <article key={item.book_id} className="soft-card rounded-3xl p-5">
+                <h3 className="section-title text-lg font-semibold">
+                  {book?.title ?? "Titre"}
+                </h3>
+                <p className="text-xs text-[var(--text-muted)]">
+                  {book?.authors?.length
+                    ? book.authors.join(", ")
+                    : "Auteur inconnu"}
+                </p>
+                <p className="text-xs text-[var(--text-muted)]">
+                  {book?.description ?? "Synopsis indisponible."}
+                </p>
+              </article>
+            );
+          })}
         </div>
       ) : (
         <div className="soft-card rounded-3xl p-6 text-sm text-[var(--text-muted)]">

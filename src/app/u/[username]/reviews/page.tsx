@@ -7,6 +7,12 @@ export default async function PublicReviewsPage({
 }: {
   params: Promise<{ username: string }>;
 }) {
+  const toBook = (
+    books:
+      | { title?: string; authors?: string[]; cover_url?: string | null; description?: string | null }
+      | { title?: string; authors?: string[]; cover_url?: string | null; description?: string | null }[]
+      | null,
+  ) => (Array.isArray(books) ? books[0] : books);
   const supabase = await createClient();
   const resolvedParams = await params;
   const rawUsername = resolvedParams?.username ?? "";
@@ -52,36 +58,43 @@ export default async function PublicReviewsPage({
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        {(reviews ?? []).filter(
-          (item) => item.books?.cover_url && item.books?.description,
-        ).length ? (
+        {(reviews ?? []).filter((item) => {
+          const book = toBook(item.books);
+          return Boolean(book?.cover_url && book?.description);
+        }).length ? (
           (reviews ?? [])
-            .filter((item) => item.books?.cover_url && item.books?.description)
-            .map((item) => (
-            <article key={item.book_id} className="soft-card rounded-3xl p-5">
-              <h2 className="section-title text-lg font-semibold">
-                {item.books?.title ?? "Titre"}
-              </h2>
-              <p className="text-xs text-[var(--text-muted)]">
-                {item.books?.authors?.length
-                  ? item.books.authors.join(", ")
-                  : "Auteur inconnu"}
-              </p>
-              <p className="text-xs text-[var(--text-muted)]">
-                {synopsisText(item.books?.description ?? null)}
-              </p>
-              {item.rating ? (
-                <p className="mt-2 text-xs text-[var(--text-muted)]">
-                  Note : {item.rating}/5
-                </p>
-              ) : null}
-              {item.public_review ? (
-                <p className="mt-2 text-sm text-[var(--text)]">
-                  “{item.public_review}”
-                </p>
-              ) : null}
-            </article>
-          ))
+            .filter((item) => {
+              const book = toBook(item.books);
+              return Boolean(book?.cover_url && book?.description);
+            })
+            .map((item) => {
+              const book = toBook(item.books);
+              return (
+                <article key={item.book_id} className="soft-card rounded-3xl p-5">
+                  <h2 className="section-title text-lg font-semibold">
+                    {book?.title ?? "Titre"}
+                  </h2>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {book?.authors?.length
+                      ? book.authors.join(", ")
+                      : "Auteur inconnu"}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {synopsisText(book?.description ?? null)}
+                  </p>
+                  {item.rating ? (
+                    <p className="mt-2 text-xs text-[var(--text-muted)]">
+                      Note : {item.rating}/5
+                    </p>
+                  ) : null}
+                  {item.public_review ? (
+                    <p className="mt-2 text-sm text-[var(--text)]">
+                      “{item.public_review}”
+                    </p>
+                  ) : null}
+                </article>
+              );
+            })
         ) : (
           <div className="soft-card rounded-3xl p-6 text-sm text-[var(--text-muted)]">
             Aucun avis public.

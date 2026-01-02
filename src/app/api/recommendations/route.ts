@@ -5,6 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const bookId = searchParams.get("bookId");
+  const toBook = (
+    books:
+      | { title?: string; categories?: string[]; authors?: string[]; isbn10?: string | null; isbn13?: string | null }
+      | { title?: string; categories?: string[]; authors?: string[]; isbn10?: string | null; isbn13?: string | null }[]
+      | null,
+  ) => (Array.isArray(books) ? books[0] : books);
 
   const supabase = await createClient();
   const {
@@ -44,16 +50,17 @@ export async function GET(request: Request) {
   (userBooks ?? []).forEach((row) => {
     if (row.in_library) libraryCount += 1;
     if (row.in_wishlist) wishlistCount += 1;
-    const categories = row.books?.categories ?? [];
+    const book = toBook(row.books);
+    const categories = book?.categories ?? [];
     categories.forEach((category) => {
       categoriesCount.set(category, (categoriesCount.get(category) ?? 0) + 1);
     });
-    const title = row.books?.title;
+    const title = book?.title;
     if (title) {
       const weight = typeof row.rating === "number" ? row.rating : 1;
       titleScores.set(title, (titleScores.get(title) ?? 0) + weight);
     }
-    const authors = row.books?.authors ?? [];
+    const authors = book?.authors ?? [];
     authors.forEach((author) => {
       if (!author) return;
       authorScores.set(author, (authorScores.get(author) ?? 0) + 1);
@@ -123,7 +130,10 @@ export async function GET(request: Request) {
   const ownedIds = new Set((owned ?? []).map((row) => row.book_id));
   const ownedIsbns = new Set(
     (owned ?? [])
-      .flatMap((row) => [row.books?.isbn10, row.books?.isbn13])
+      .flatMap((row) => {
+        const book = toBook(row.books);
+        return [book?.isbn10, book?.isbn13];
+      })
       .filter((value): value is string => Boolean(value)),
   );
   let normalized = (payload.items ?? [])

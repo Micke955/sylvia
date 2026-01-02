@@ -87,6 +87,9 @@ export default async function StatsPage() {
     .eq("in_wishlist", true)
     .order("added_at", { ascending: false });
 
+  const toBook = (books: { title?: string; authors?: string[]; categories?: string[] }[] | { title?: string; authors?: string[]; categories?: string[] } | null) =>
+    Array.isArray(books) ? books[0] : books;
+
   const stats = computeStats((items ?? []) as unknown as LibraryItem[]);
 
   const now = new Date();
@@ -166,9 +169,9 @@ export default async function StatsPage() {
       : 0;
 
   const genreCount = (items ?? []).reduce<Record<string, number>>((acc, item) => {
-    const book = Array.isArray(item.books) ? item.books[0] : item.books;
+    const book = toBook(item.books);
     const categories = book?.categories ?? [];
-    categories.forEach((category) => {
+    categories.forEach((category: string) => {
       if (!category) return;
       acc[category] = (acc[category] ?? 0) + 1;
     });
@@ -179,15 +182,18 @@ export default async function StatsPage() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
 
-  const timelineItems = (items ?? []).map((item) => ({
-    book_id: item.book_id,
-    title: item.books?.title ?? "Titre",
-    authors: item.books?.authors?.join(", ") ?? "",
-    reading_status: item.reading_status ?? null,
-    reading_started_at: item.reading_started_at ?? null,
-    reading_finished_at: item.reading_finished_at ?? null,
-    added_at: item.added_at ?? "",
-  }));
+  const timelineItems = (items ?? []).map((item) => {
+    const book = toBook(item.books);
+    return {
+      book_id: item.book_id,
+      title: book?.title ?? "Titre",
+      authors: book?.authors?.join(", ") ?? "",
+      reading_status: item.reading_status ?? null,
+      reading_started_at: item.reading_started_at ?? null,
+      reading_finished_at: item.reading_finished_at ?? null,
+      added_at: item.added_at ?? "",
+    };
+  });
 
   return (
     <div className="space-y-6">
@@ -258,8 +264,8 @@ export default async function StatsPage() {
       </div>
       <StatsExports
         libraryRows={(items ?? []).map((item) => ({
-          title: item.books?.title ?? "",
-          authors: item.books?.authors?.join(", ") ?? "",
+          title: toBook(item.books)?.title ?? "",
+          authors: toBook(item.books)?.authors?.join(", ") ?? "",
           status: item.reading_status ?? "",
           rating: item.rating ?? "",
           started_at: item.reading_started_at ?? "",
@@ -269,8 +275,8 @@ export default async function StatsPage() {
           added_at: item.added_at ?? "",
         }))}
         wishlistRows={(wishlistRows ?? []).map((row) => ({
-          title: row.books?.title ?? "",
-          authors: row.books?.authors?.join(", ") ?? "",
+          title: toBook(row.books)?.title ?? "",
+          authors: toBook(row.books)?.authors?.join(", ") ?? "",
           added_at: row.added_at ?? "",
         }))}
       />

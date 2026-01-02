@@ -142,7 +142,7 @@ export default function FeedList() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={normalizeAvatarUrl(item.profile?.avatar_url ?? null) ?? ""}
-                      alt={item.profile.username ?? "Avatar"}
+                      alt={item.profile?.username ?? "Avatar"}
                       className="h-full w-full object-cover"
                       onError={(event) => {
                         event.currentTarget.src = "/logo.png";

@@ -22,6 +22,9 @@ const subjects = [
 
 export async function GET() {
   const supabase = await createClient();
+  const toBook = (
+    books: { categories?: string[] | null } | { categories?: string[] | null }[] | null,
+  ) => (Array.isArray(books) ? books[0] : books);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -37,7 +40,7 @@ export async function GET() {
     .or("in_library.eq.true,in_wishlist.eq.true");
 
   const userSubjects = (userBooks ?? [])
-    .flatMap((row) => row.books?.categories ?? [])
+    .flatMap((row) => toBook(row.books)?.categories ?? [])
     .map((value) => value.trim())
     .filter((value) => value.length >= 3);
 
