@@ -166,7 +166,8 @@ export default async function StatsPage() {
       : 0;
 
   const genreCount = (items ?? []).reduce<Record<string, number>>((acc, item) => {
-    const categories = item.books?.categories ?? [];
+    const book = Array.isArray(item.books) ? item.books[0] : item.books;
+    const categories = book?.categories ?? [];
     categories.forEach((category) => {
       if (!category) return;
       acc[category] = (acc[category] ?? 0) + 1;
