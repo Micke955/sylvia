@@ -40,11 +40,14 @@ export default async function AppLayout({
       .eq("user_id", user.id)
       .eq("reading_status", "reading")
       .limit(3);
-    readingItems = (data ?? []).map((item) => ({
-      book_id: item.book_id,
-      reading_started_at: item.reading_started_at ?? null,
-      title: item.books?.title ?? "Lecture en cours",
-    }));
+    readingItems = (data ?? []).map((item) => {
+      const book = Array.isArray(item.books) ? item.books[0] : item.books;
+      return {
+        book_id: item.book_id,
+        reading_started_at: item.reading_started_at ?? null,
+        title: book?.title ?? "Lecture en cours",
+      };
+    });
   }
 
   return (
