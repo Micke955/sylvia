@@ -56,23 +56,23 @@ export default async function HomePage() {
     .order("added_at", { ascending: false });
 
   const wishlistBooks = filterVisible(
-    (wishlistItems ?? []).map((item) => item.books as BookRecord | null),
+    (wishlistItems ?? []).map((item) => item.books as unknown as BookRecord | null),
   );
 
   const readingNow = filterVisible(
     (libraryItems ?? [])
       .filter((item) => item.reading_status === "reading")
-      .map((item) => item.books as BookRecord | null),
+      .map((item) => item.books as unknown as BookRecord | null),
   );
   const toRead = filterVisible(
     (libraryItems ?? [])
       .filter((item) => item.reading_status === "to_read")
-      .map((item) => item.books as BookRecord | null),
+      .map((item) => item.books as unknown as BookRecord | null),
   );
   const finished = filterVisible(
     (libraryItems ?? [])
       .filter((item) => item.reading_status === "finished")
-      .map((item) => item.books as BookRecord | null),
+      .map((item) => item.books as unknown as BookRecord | null),
   );
 
 
