@@ -78,7 +78,7 @@ export default async function HomePage() {
 
   const genreCount = (libraryItems ?? []).reduce<Record<string, number>>(
     (acc, item) => {
-      const categories = (item.books as BookRecord | null)?.categories ?? [];
+      const categories = (item.books as unknown as BookRecord | null)?.categories ?? [];
       categories.forEach((category) => {
         if (!category) return;
         acc[category] = (acc[category] ?? 0) + 1;
