@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   title: "SYLVIA - Gestion de bibliotheque",
   description:
     "Rechercher des livres, gerer votre bibliotheque, wishlist et partager votre collection.",
+  manifest: "/manifest.webmanifest",
+  themeColor: "#0f1612",
 };
 
 export default function RootLayout({

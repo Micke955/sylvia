@@ -1,0 +1,16 @@
+{
+  "name": "SYLVIA",
+  "short_name": "SYLVIA",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f1612",
+  "theme_color": "#0f1612",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}
